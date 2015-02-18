@@ -1,0 +1,115 @@
+class SinglyLinkedNode(object):
+
+    def __init__(self, item=None, next_link=None):
+        super(SinglyLinkedNode, self).__init__()
+        self._item = item
+        self._next = next_link
+
+    @property
+    def item(self):
+        return self._item
+
+    @item.setter
+    def item(self, item):
+        self._item = item
+
+    @property
+    def next(self):
+        return self._next
+
+    @next.setter
+    def next(self, next):
+        self._next = next
+
+    def __repr__(self):
+        return repr(self.item)
+
+
+class SinglyLinkedList(object): 
+
+    def __init__(self):
+        super(SinglyLinkedList, self).__init__()
+        self._head = SinglyLinkedNode()
+
+    @property
+    def head(self):
+        return self._head
+
+    @head.setter
+    def head(self, head):
+        self._head = head
+
+    def __len__(self):
+        length = 0
+        current = head();
+        while (current.next() is not None):
+            length += 1
+            current = current.next()
+        return length
+
+    def __iter__(self):
+        current = head()
+        for i in range(0,__len__()):
+            if (item(current) is not None):
+                print item(current)
+                current = next(current)
+
+    def __contains__(self, item):
+        current = head()
+        for i in range(0,__len__()):
+            if (current.item() == item):
+                return True
+            elif (next(current) is not None):
+                current = current.next()
+        return False
+
+    def remove(self, item):
+        previous = None
+        current = head()
+        if (current.item() == item):
+            head(current.next())
+        while (current.item() is not None):
+            if (current.item() == item):
+                if (previous is None):
+                    head(current.next())
+                else: 
+                    previous.next(current.next())
+                return True
+            elif (current.next() is not None):
+                previous = current
+                current = current.next()
+        return False
+
+    def prepend(self, item):
+        if (self.head.item is None):
+            new = SinglyLinkedNode(item)
+            self.head(new)
+        else:
+            temp = self.head
+            self.head(item)
+            self.head.next(temp)
+
+    def __repr__(self):
+        s = "List:" + "->".join([item for item in self])
+        return s
+
+def main():
+    # Thoroughly test your program and produce useful out.
+    #
+    # Do at least these kinds of tests:
+    #  (1)  Check the boundary conditions (empty containers,
+    #       full containers, etc)
+    #  (2)  Test your hash tables for terrible hash functions
+    #       that map to keys in the middle or ends of your
+    #       table
+    #  (3)  Check your table on 100s or randomly generated
+    #       sets of keys to make sure they function
+    #
+    #  (4)  Make sure that no keys / items are lost, especially
+    #       as a result of deleting another key
+    print "Testing"
+    test = SinglyLinkedList()
+    testa = SinglyLinkedNode()
+
+if __name__ == '__main__':
+    main()

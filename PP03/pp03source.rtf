@@ -1,0 +1,258 @@
+{\rtf1\ansi\deff0{\fonttbl{\f0\fmodern\fprq1\fcharset0;}}{\colortbl;\red136\green136\blue136;\red186\green33\blue33;\red0\green68\blue221;\red102\green102\blue102;\red64\green128\blue128;\red160\green160\blue0;\red25\green23\blue124;\red0\green128\blue0;\red187\green102\blue136;\red187\green102\blue34;\red136\green0\blue0;\red170\green34\blue255;\red153\green153\blue153;\red0\green160\blue0;\red160\green0\blue0;\red255\green0\blue0;\red128\green0\blue128;\red176\green0\blue64;\red0\green0\blue255;\red187\green187\blue187;\red188\green122\blue0;\red0\green0\blue128;\red125\green144\blue41;\red210\green65\blue58;}\f0{\cf8\b from} {\cf19\b pylab} {\cf8\b import} {\cf4 *}  {\cf5\i # NOQA}\par
+{\cf8\b from} {\cf19\b skimage} {\cf8\b import} img_as_float\par
+{\cf8\b import} {\cf19\b math}\par
+\par
+\par
+{\cf8\b def} {\cf19 dual_gradient_energy}(img):\par
+    {\cf2\i """Return a W x H array of floats, the energy at each pixel\par
+       in the passed image.\par
+    """}\par
+    h {\cf4 =} img{\cf4 .}shape[{\cf4 0}]\par
+    w {\cf4 =} img{\cf4 .}shape[{\cf4 1}]\par
+    R {\cf4 =} img[:, :, {\cf4 0}]\par
+    G {\cf4 =} img[:, :, {\cf4 1}]\par
+    B {\cf4 =} img[:, :, {\cf4 2}]\par
+    dxRed {\cf4 =} [[[] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(w)] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(h)]\par
+    dyRed {\cf4 =} [[[] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(w)] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(h)]\par
+    dxGreen {\cf4 =} [[[] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(w)] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(h)]\par
+    dyGreen {\cf4 =} [[[] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(w)] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(h)]\par
+    dxBlue {\cf4 =} [[[] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(w)] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(h)]\par
+    dyBlue {\cf4 =} [[[] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(w)] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(h)]\par
+    energy {\cf4 =} [[[] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(w)] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(h)]\par
+    {\cf8\b for} i {\cf12\b in} {\cf8 range}({\cf4 0}, h):\par
+        dxRed[i][{\cf4 0}] {\cf4 =} R[i][{\cf4 1}] {\cf4 -} R[i][w {\cf4 -} {\cf4 1}]\par
+        dxRed[i][{\cf4 0}] {\cf4 =} dxRed[i][{\cf4 0}] {\cf4 *} dxRed[i][{\cf4 0}]\par
+        dxRed[i][w {\cf4 -} {\cf4 1}] {\cf4 =} R[i][{\cf4 0}] {\cf4 -} R[i][w {\cf4 -} {\cf4 2}]\par
+        dxRed[i][w {\cf4 -} {\cf4 1}] {\cf4 =} dxRed[i][w {\cf4 -} {\cf4 1}] {\cf4 *} dxRed[i][w {\cf4 -} {\cf4 1}]\par
+        dxGreen[i][{\cf4 0}] {\cf4 =} G[i][{\cf4 1}] {\cf4 -} G[i][w {\cf4 -} {\cf4 1}]\par
+        dxGreen[i][{\cf4 0}] {\cf4 =} dxGreen[i][{\cf4 0}] {\cf4 *} dxGreen[i][{\cf4 0}]\par
+        dxGreen[i][w {\cf4 -} {\cf4 1}] {\cf4 =} G[i][{\cf4 0}] {\cf4 -} G[i][w {\cf4 -} {\cf4 2}]\par
+        dxGreen[i][w {\cf4 -} {\cf4 1}] {\cf4 =} dxGreen[i][w {\cf4 -} {\cf4 1}] {\cf4 *} dxGreen[i][w {\cf4 -} {\cf4 1}]\par
+        dxBlue[i][{\cf4 0}] {\cf4 =} B[i][{\cf4 1}] {\cf4 -} B[i][w {\cf4 -} {\cf4 1}]\par
+        dxBlue[i][{\cf4 0}] {\cf4 =} dxBlue[i][{\cf4 0}] {\cf4 *} dxBlue[i][{\cf4 0}]\par
+        dxBlue[i][w {\cf4 -} {\cf4 1}] {\cf4 =} B[i][{\cf4 0}] {\cf4 -} B[i][w {\cf4 -} {\cf4 2}]\par
+        dxBlue[i][w {\cf4 -} {\cf4 1}] {\cf4 =} dxBlue[i][w {\cf4 -} {\cf4 1}] {\cf4 *} dxBlue[i][w {\cf4 -} {\cf4 1}]\par
+\par
+        energy[i][{\cf4 0}] {\cf4 =} dxRed[i][{\cf4 0}] {\cf4 +} dxGreen[i][{\cf4 0}] {\cf4 +} dxBlue[i][{\cf4 0}]\par
+        energy[i][w {\cf4 -} {\cf4 1}] {\cf4 =} dxRed[i][w {\cf4 -} {\cf4 1}] {\cf4 +} \\\par
+            dxGreen[i][w {\cf4 -} {\cf4 1}] {\cf4 +} dxBlue[i][w {\cf4 -} {\cf4 1}]\par
+\par
+        {\cf8\b for} j {\cf12\b in} {\cf8 range}({\cf4 1}, w {\cf4 -} {\cf4 1}):\par
+            dxRed[i][j] {\cf4 =} R[i][j {\cf4 +} {\cf4 1}] {\cf4 -} R[i][j {\cf4 -} {\cf4 1}]\par
+            dxRed[i][j] {\cf4 =} dxRed[i][j] {\cf4 *} dxRed[i][j]\par
+            dxGreen[i][j] {\cf4 =} G[i][j {\cf4 +} {\cf4 1}] {\cf4 -} G[i][j {\cf4 -} {\cf4 1}]\par
+            dxGreen[i][j] {\cf4 =} dxGreen[i][j] {\cf4 *} dxGreen[i][j]\par
+            dxBlue[i][j] {\cf4 =} B[i][j {\cf4 +} {\cf4 1}] {\cf4 -} B[i][j {\cf4 -} {\cf4 1}]\par
+            dxBlue[i][j] {\cf4 =} dxBlue[i][j] {\cf4 *} dxBlue[i][j]\par
+\par
+            energy[i][j] {\cf4 =} dxRed[i][j] {\cf4 +} dxGreen[i][j] {\cf4 +} dxBlue[i][j]\par
+\par
+    {\cf8\b for} i {\cf12\b in} {\cf8 range}({\cf4 0}, w):\par
+        dyRed[{\cf4 0}][i] {\cf4 =} R[{\cf4 1}][i] {\cf4 -} R[h {\cf4 -} {\cf4 1}][i]\par
+        dyRed[{\cf4 0}][i] {\cf4 =} dyRed[{\cf4 0}][i] {\cf4 *} dyRed[{\cf4 0}][i]\par
+        dyRed[h {\cf4 -} {\cf4 1}][i] {\cf4 =} R[{\cf4 0}][i] {\cf4 -} R[h {\cf4 -} {\cf4 2}][i]\par
+        dyRed[h {\cf4 -} {\cf4 1}][i] {\cf4 =} dyRed[h {\cf4 -} {\cf4 1}][i] {\cf4 *} dyRed[h {\cf4 -} {\cf4 1}][i]\par
+        dyGreen[{\cf4 0}][i] {\cf4 =} G[{\cf4 1}][i] {\cf4 -} G[h {\cf4 -} {\cf4 1}][i]\par
+        dyGreen[{\cf4 0}][i] {\cf4 =} dyGreen[{\cf4 0}][i] {\cf4 *} dyGreen[{\cf4 0}][i]\par
+        dyGreen[h {\cf4 -} {\cf4 1}][i] {\cf4 =} G[{\cf4 0}][i] {\cf4 -} G[h {\cf4 -} {\cf4 2}][i]\par
+        dyGreen[h {\cf4 -} {\cf4 1}][i] {\cf4 =} dyGreen[h {\cf4 -} {\cf4 1}][i] {\cf4 *} dyGreen[h {\cf4 -} {\cf4 1}][i]\par
+        dyBlue[{\cf4 0}][i] {\cf4 =} B[{\cf4 1}][i] {\cf4 -} B[h {\cf4 -} {\cf4 1}][i]\par
+        dyBlue[{\cf4 0}][i] {\cf4 =} dyBlue[{\cf4 0}][i] {\cf4 *} dyBlue[{\cf4 0}][i]\par
+        dyBlue[h {\cf4 -} {\cf4 1}][i] {\cf4 =} B[{\cf4 0}][i] {\cf4 -} B[h {\cf4 -} {\cf4 2}][i]\par
+        dyBlue[h {\cf4 -} {\cf4 1}][i] {\cf4 =} dyBlue[h {\cf4 -} {\cf4 1}][i] {\cf4 *} dyBlue[h {\cf4 -} {\cf4 1}][i]\par
+\par
+        energy[{\cf4 0}][i] {\cf4 +}{\cf4 =} dyRed[{\cf4 0}][i] {\cf4 +} dyGreen[{\cf4 0}][i] {\cf4 +} dyBlue[{\cf4 0}][i]\par
+        energy[h {\cf4 -} {\cf4 1}][i] {\cf4 +}{\cf4 =} dyRed[h {\cf4 -} {\cf4 1}][i] {\cf4 +} \\\par
+            dyGreen[h {\cf4 -} {\cf4 1}][i] {\cf4 +} dyBlue[h {\cf4 -} {\cf4 1}][i]\par
+\par
+        {\cf8\b for} j {\cf12\b in} {\cf8 range}({\cf4 1}, h {\cf4 -} {\cf4 1}):\par
+            dyRed[j][i] {\cf4 =} R[j {\cf4 +} {\cf4 1}][i] {\cf4 -} R[j {\cf4 -} {\cf4 1}][i]\par
+            dyRed[j][i] {\cf4 =} dyRed[j][i] {\cf4 *} dyRed[j][i]\par
+            dyGreen[j][i] {\cf4 =} G[j {\cf4 +} {\cf4 1}][i] {\cf4 -} G[j {\cf4 -} {\cf4 1}][i]\par
+            dyGreen[j][i] {\cf4 =} dyGreen[j][i] {\cf4 *} dyGreen[j][i]\par
+            dyBlue[j][i] {\cf4 =} B[j {\cf4 +} {\cf4 1}][i] {\cf4 -} B[j {\cf4 -} {\cf4 1}][i]\par
+            dyBlue[j][i] {\cf4 =} dyBlue[j][i] {\cf4 *} dyBlue[j][i]\par
+\par
+            energy[j][i] {\cf4 +}{\cf4 =} dyRed[j][i] {\cf4 +} dyGreen[j][i] {\cf4 +} dyBlue[j][i]\par
+    {\cf8\b print}({\cf2 "}{\cf2 Energy is: }{\cf2 "})\par
+    {\cf8\b print}(energy)\par
+    {\cf8\b return} energy\par
+\par
+\par
+{\cf8\b def} {\cf19 find_seam}(img, energy):\par
+    {\cf2\i """Return an array of H integers, for each row of the passed\par
+       image return the column of the seam (lowest energy path).\par
+    """}\par
+    h {\cf4 =} img{\cf4 .}shape[{\cf4 0}]\par
+    w {\cf4 =} img{\cf4 .}shape[{\cf4 1}]\par
+    shortestPath {\cf4 =} [[[[] {\cf8\b for} _ {\cf12\b in} {\cf8 range}({\cf4 2})] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(w)]\par
+                    {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(h)]\par
+    {\cf8\b for} j {\cf12\b in} {\cf8 range}({\cf4 0}, w):\par
+        shortestPath[{\cf4 0}][j][{\cf4 0}] {\cf4 =} {\cf4 -}{\cf4 1}\par
+        shortestPath[{\cf4 0}][j][{\cf4 1}] {\cf4 =} energy[{\cf4 0}][j]\par
+        {\cf8\b for} i {\cf12\b in} {\cf8 range}({\cf4 1}, h):\par
+            shortestPath[i][j][{\cf4 0}] {\cf4 =} {\cf4 -}{\cf4 1}\par
+            shortestPath[i][j][{\cf4 1}] {\cf4 =} {\cf8 float}({\cf2 "}{\cf2 inf}{\cf2 "})\par
+    {\cf8\b for} j {\cf12\b in} {\cf8 range}({\cf4 0}, w):\par
+        {\cf8\b for} i {\cf12\b in} {\cf8 range}({\cf4 0}, h {\cf4 -} {\cf4 1}):\par
+            {\cf8\b if} (j {\cf4 ==} {\cf4 0}):\par
+                {\cf8\b if} (shortestPath[i][j][{\cf4 1}] {\cf4 <} shortestPath[i][j {\cf4 +} {\cf4 1}][{\cf4 1}]):\par
+                    shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 0}] {\cf4 =} j\par
+                    shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 1}] {\cf4 =} shortestPath[i][j][{\cf4 1}] {\cf4 +} \\\par
+                        energy[i {\cf4 +} {\cf4 1}][j]\par
+                {\cf8\b else}:\par
+                    shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 0}] {\cf4 =} j {\cf4 +} {\cf4 1}\par
+                    shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 1}] {\cf4 =} shortestPath[i][j {\cf4 +} {\cf4 1}][{\cf4 1}] {\cf4 +} \\\par
+                        energy[i {\cf4 +} {\cf4 1}][j]\par
+            {\cf8\b if} (j {\cf4 ==} w {\cf4 -} {\cf4 1}):\par
+                {\cf8\b if} (shortestPath[i][j {\cf4 -} {\cf4 1}][{\cf4 1}] {\cf4 <} shortestPath[i][j][{\cf4 1}]):\par
+                    shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 0}] {\cf4 =} j {\cf4 -} {\cf4 1}\par
+                    shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 1}] {\cf4 =} shortestPath[i][j {\cf4 -} {\cf4 1}][{\cf4 1}] {\cf4 +} \\\par
+                        energy[i {\cf4 +} {\cf4 1}][j]\par
+                {\cf8\b else}:\par
+                    shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 0}] {\cf4 =} j\par
+                    shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 1}] {\cf4 =} shortestPath[i][j][{\cf4 1}] {\cf4 +} \\\par
+                        energy[i {\cf4 +} {\cf4 1}][j]\par
+            {\cf8\b else}:\par
+                {\cf8\b if} (shortestPath[i][j {\cf4 -} {\cf4 1}][{\cf4 1}] {\cf4 <} shortestPath[i][j][{\cf4 1}]):\par
+                    {\cf8\b if} (shortestPath[i][j {\cf4 -} {\cf4 1}][{\cf4 1}] {\cf4 <} shortestPath[i][j {\cf4 +} {\cf4 1}][{\cf4 1}]):\par
+                        shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 0}] {\cf4 =} j {\cf4 -} {\cf4 1}\par
+                        shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 1}] {\cf4 =} shortestPath[i][j {\cf4 -} {\cf4 1}][{\cf4 1}] {\cf4 +} \\\par
+                            energy[i {\cf4 +} {\cf4 1}][j]\par
+                    {\cf8\b else}:\par
+                        shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 0}] {\cf4 =} j {\cf4 +} {\cf4 1}\par
+                        shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 1}] {\cf4 =} shortestPath[i][j {\cf4 +} {\cf4 1}][{\cf4 1}] {\cf4 +} \\\par
+                            energy[i {\cf4 +} {\cf4 1}][j]\par
+                {\cf8\b else}:\par
+                    {\cf8\b if} (shortestPath[i][j][{\cf4 1}] {\cf4 <} shortestPath[i][j {\cf4 +} {\cf4 1}][{\cf4 1}]):\par
+                        shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 0}] {\cf4 =} j\par
+                        shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 1}] {\cf4 =} shortestPath[i][j][{\cf4 1}] {\cf4 +} \\\par
+                            energy[i {\cf4 +} {\cf4 1}][j]\par
+                    {\cf8\b else}:\par
+                        shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 0}] {\cf4 =} j {\cf4 +} {\cf4 1}\par
+                        shortestPath[i {\cf4 +} {\cf4 1}][j][{\cf4 1}] {\cf4 =} shortestPath[i][j {\cf4 +} {\cf4 1}][{\cf4 1}] {\cf4 +} \\\par
+                            energy[i {\cf4 +} {\cf4 1}][j]\par
+\par
+    optimal {\cf4 =} ({\cf4 -}{\cf4 1}, {\cf8 float}({\cf2 "}{\cf2 inf}{\cf2 "}))\par
+    {\cf8\b for} j {\cf12\b in} {\cf8 range}({\cf4 0}, w):\par
+        {\cf8\b if} (shortestPath[h {\cf4 -} {\cf4 1}][j][{\cf4 1}] {\cf4 <} optimal[{\cf4 1}]):\par
+            optimal {\cf4 =} (j, shortestPath[h {\cf4 -} {\cf4 1}][j][{\cf4 1}])\par
+    seam {\cf4 =} [[] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(h)]\par
+    seam[h {\cf4 -} {\cf4 1}] {\cf4 =} optimal[{\cf4 0}]\par
+    {\cf8\b for} i {\cf12\b in} {\cf8 range}(h {\cf4 -} {\cf4 2}, {\cf4 -}{\cf4 1}, {\cf4 -}{\cf4 1}):\par
+        seam[i] {\cf4 =} shortestPath[i {\cf4 +} {\cf4 1}][seam[i {\cf4 +} {\cf4 1}]][{\cf4 0}]\par
+    {\cf8\b print}({\cf2 "}{\cf2 Seam is:}{\cf2 "})\par
+    {\cf8\b print}(seam)\par
+    {\cf8\b return} seam\par
+\par
+\par
+{\cf8\b def} {\cf19 remove_seam}(img, seam):\par
+    {\cf2\i """Modify passed image in-place and return a W-1 x H x 3\par
+       slice - the image minus the seam.\par
+    """}\par
+    h {\cf4 =} img{\cf4 .}shape[{\cf4 0}]\par
+    w {\cf4 =} img{\cf4 .}shape[{\cf4 1}]\par
+\par
+    newImage {\cf4 =} [[[] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(w {\cf4 -} {\cf4 1})] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(h)]\par
+    {\cf8\b for} i {\cf12\b in} {\cf8 range}({\cf4 0}, h):\par
+        currentJ {\cf4 =} {\cf4 0}\par
+        {\cf8\b for} j {\cf12\b in} {\cf8 range}({\cf4 0}, w):\par
+            {\cf8\b if} (j {\cf4 !=} seam[i]):\par
+                newImage[i][currentJ][:] {\cf4 =} img[i][j][:]\par
+                currentJ {\cf4 =} currentJ {\cf4 +} {\cf4 1}\par
+    {\cf8\b print}({\cf2 "}{\cf2 The image without the seam is: }{\cf2 "})\par
+    {\cf8\b print}(newImage)\par
+    {\cf8\b return} newImage\par
+\par
+\par
+{\cf8\b def} {\cf19 plot_seam}(img, seam, energy):\par
+    {\cf2\i """Plot the original image, its energy function, a visualization\par
+       of the seam, and the new image with seam removed.\par
+    """}\par
+    h {\cf4 =} img{\cf4 .}shape[{\cf4 0}]\par
+    w {\cf4 =} img{\cf4 .}shape[{\cf4 1}]\par
+\par
+    figure()\par
+    gray()\par
+\par
+    subplot({\cf4 2}, {\cf4 2}, {\cf4 1})\par
+    imshow(img)\par
+    title({\cf2 '}{\cf2 RGB}{\cf2 '})\par
+\par
+    maxEnergy {\cf4 =} {\cf4 0}\par
+    {\cf8\b for} i {\cf12\b in} {\cf8 range}({\cf4 0}, h):\par
+        {\cf8\b for} j {\cf12\b in} {\cf8 range}({\cf4 0}, w):\par
+            {\cf8\b if} (energy[i][j] {\cf4 >} maxEnergy):\par
+                maxEnergy {\cf4 =} energy[i][j]\par
+    energyImage {\cf4 =} [[[] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(w)] {\cf8\b for} _ {\cf12\b in} {\cf8 xrange}(h)]\par
+    {\cf8\b for} i {\cf12\b in} {\cf8 range}({\cf4 0}, h):\par
+        {\cf8\b for} j {\cf12\b in} {\cf8 range}({\cf4 0}, w):\par
+            energyImage[i][j] {\cf4 =} math{\cf4 .}floor(energy[i][j] {\cf4 /} maxEnergy {\cf4 *} {\cf4 255})\par
+    subplot({\cf4 2}, {\cf4 2}, {\cf4 2})\par
+    imshow(energyImage)\par
+    title({\cf2 '}{\cf2 energy}{\cf2 '})\par
+\par
+    seamImage {\cf4 =} energyImage\par
+    {\cf8\b for} i {\cf12\b in} {\cf8 range}({\cf4 0}, h):\par
+        seamImage[i][seam[i]] {\cf4 =} {\cf4 255.0}\par
+    subplot({\cf4 2}, {\cf4 2}, {\cf4 4})\par
+    imshow(seamImage)\par
+    title({\cf2 '}{\cf2 seam}{\cf2 '})\par
+\par
+    newImage {\cf4 =} remove_seam(img, seam)\par
+    subplot({\cf4 2}, {\cf4 2}, {\cf4 3})\par
+    imshow(newImage)\par
+    title({\cf2 '}{\cf2 new}{\cf2 '})\par
+\par
+    show()\par
+\par
+\par
+{\cf8\b def} {\cf19 main}():\par
+    {\cf2\i """Use dynamic programming to find the seam for test images\par
+       and plot relevant visualizations.\par
+    """}\par
+    surfing {\cf4 =} imread({\cf2 "}{\cf2 HJoceanSmall.png}{\cf2 "})\par
+    small1 {\cf4 =} [\par
+        [[{\cf4 255.0}, {\cf4 101.0}, {\cf4 51.0}], [{\cf4 255.0}, {\cf4 101.0}, {\cf4 153.0}], [{\cf4 255.0}, {\cf4 101.0}, {\cf4 255.0}]],\par
+        [[{\cf4 255.0}, {\cf4 153.0}, {\cf4 51.0}], [{\cf4 255.0}, {\cf4 153.0}, {\cf4 153.0}],\par
+         [{\cf4 255.0}, {\cf4 153.0}, {\cf4 255.0}]],\par
+        [[{\cf4 255.0}, {\cf4 203.0}, {\cf4 51.0}], [{\cf4 255.0}, {\cf4 204.0}, {\cf4 153.0}],\par
+         [{\cf4 255.0}, {\cf4 205.0}, {\cf4 255.0}]],\par
+        [[{\cf4 255.0}, {\cf4 255.0}, {\cf4 51.0}], [{\cf4 255.0}, {\cf4 255.0}, {\cf4 153.0}], [{\cf4 255.0}, {\cf4 255.0}, {\cf4 255.0}]]]\par
+    small2 {\cf4 =} [\par
+        [[{\cf4 97.0}, {\cf4 82.0}, {\cf4 107.0}], [{\cf4 220.0}, {\cf4 172.0}, {\cf4 141.0}], [{\cf4 243.0}, {\cf4 71.0}, {\cf4 205.0}],\par
+            [{\cf4 129.0}, {\cf4 173.0}, {\cf4 222.0}], [{\cf4 225.0}, {\cf4 40.0}, {\cf4 209.0}], [{\cf4 66.0}, {\cf4 109.0}, {\cf4 219.0}]],\par
+        [[{\cf4 181.0}, {\cf4 78.0}, {\cf4 68.0}], [{\cf4 15.0}, {\cf4 28.0}, {\cf4 216.0}], [{\cf4 245.0}, {\cf4 150.0}, {\cf4 150.0}],\par
+         [{\cf4 177.0}, {\cf4 100.0}, {\cf4 167.0}], [{\cf4 205.0}, {\cf4 205.0}, {\cf4 177.0}], [{\cf4 147.0}, {\cf4 58.0}, {\cf4 99.0}]],\par
+        [[{\cf4 196.0}, {\cf4 224.0}, {\cf4 21.0}], [{\cf4 166.0}, {\cf4 217.0}, {\cf4 190.0}], [{\cf4 128.0}, {\cf4 120.0}, {\cf4 162.0}],\par
+         [{\cf4 104.0}, {\cf4 59.0}, {\cf4 110.0}], [{\cf4 49.0}, {\cf4 148.0}, {\cf4 137.0}], [{\cf4 192.0}, {\cf4 101.0}, {\cf4 89.0}]],\par
+        [[{\cf4 83.0}, {\cf4 143.0}, {\cf4 103.0}], [{\cf4 110.0}, {\cf4 79.0}, {\cf4 247.0}], [{\cf4 106.0}, {\cf4 71.0}, {\cf4 174.0}],\par
+         [{\cf4 92.0}, {\cf4 240.0}, {\cf4 205.0}], [{\cf4 129.0}, {\cf4 56.0}, {\cf4 146.0}], [{\cf4 121.0}, {\cf4 111.0}, {\cf4 147.0}]],\par
+        [[{\cf4 82.0}, {\cf4 157.0}, {\cf4 137.0}], [{\cf4 92.0}, {\cf4 110.0}, {\cf4 129.0}], [{\cf4 183.0}, {\cf4 107.0}, {\cf4 80.0}],\par
+         [{\cf4 89.0}, {\cf4 24.0}, {\cf4 217.0}], [{\cf4 207.0}, {\cf4 69.0}, {\cf4 32.0}], [{\cf4 156.0}, {\cf4 112.0}, {\cf4 31.0}]]]\par
+\par
+    img1 {\cf4 =} img_as_float(small1)\par
+    {\cf8\b print}({\cf2 "}{\cf2 For the first small data set,}{\cf2 "})\par
+    {\cf8\b print}({\cf2 "}{\cf2 The image is: }{\cf2 "})\par
+    {\cf8\b print}(img1)\par
+    energy1 {\cf4 =} dual_gradient_energy(img1)\par
+    seam1 {\cf4 =} find_seam(img1, energy1)\par
+    plot_seam(img1, seam1, energy1)\par
+\par
+    img2 {\cf4 =} img_as_float(small2)\par
+    {\cf8\b print}({\cf2 "}{\cf2 For the second small data set,}{\cf2 "})\par
+    {\cf8\b print}({\cf2 "}{\cf2 The image is: }{\cf2 "})\par
+    {\cf8\b print}(img2)\par
+    energy2 {\cf4 =} dual_gradient_energy(img2)\par
+    seam2 {\cf4 =} find_seam(img2, energy2)\par
+    plot_seam(img2, seam2, energy2)\par
+\par
+    img3 {\cf4 =} img_as_float(surfing)\par
+    energy3 {\cf4 =} dual_gradient_energy(img3)\par
+    seam3 {\cf4 =} find_seam(img3, energy3)\par
+    plot_seam(img3, seam3, energy3)\par
+\par
+\par
+{\cf8\b if} __name__ {\cf4 ==} {\cf2 '}{\cf2 __main__}{\cf2 '}:\par
+    main()\par
+}

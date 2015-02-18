@@ -1,0 +1,87 @@
+{\rtf1\ansi\deff0{\fonttbl{\f0\fmodern\fprq1\fcharset0;}}{\colortbl;\red136\green136\blue136;\red186\green33\blue33;\red0\green68\blue221;\red102\green102\blue102;\red64\green128\blue128;\red160\green160\blue0;\red25\green23\blue124;\red0\green128\blue0;\red187\green102\blue136;\red187\green102\blue34;\red136\green0\blue0;\red170\green34\blue255;\red153\green153\blue153;\red0\green160\blue0;\red160\green0\blue0;\red255\green0\blue0;\red128\green0\blue128;\red176\green0\blue64;\red0\green0\blue255;\red187\green187\blue187;\red188\green122\blue0;\red0\green0\blue128;\red125\green144\blue41;\red210\green65\blue58;}\f0{\cf8\b import} {\cf19\b sys}\par
+INFINITY {\cf4 =} sys{\cf4 .}maxint\par
+\par
+\par
+{\cf8\b def} {\cf19 print_neatly}(words, M):\par
+    {\cf2\i """ Print text neatly.\par
+\par
+    Parameters\par
+    ----------\par
+    words: list of str\par
+            Each string in the list is a word from the file.\par
+    M: int\par
+            The max number of characters per line including spaces\par
+\par
+    Returns\par
+    -------\par
+    cost: number\par
+            The optimal value as described in the textbook.\par
+    text: str\par
+            The entire text as one string with newline characters.\par
+            It should not end with a blank line.\par
+\par
+    Details\par
+    -------\par
+            Look at print_neatly_test for some code to test the solution.\par
+    """}\par
+    n {\cf4 =} {\cf8 len}(words)\par
+    linecost {\cf4 =} [[{\cf4 0} {\cf8\b for} x {\cf12\b in} {\cf8 range}(n)] {\cf8\b for} x {\cf12\b in} {\cf8 range}(n)]\par
+    options {\cf4 =} [[[{\cf4 0} {\cf8\b for} x {\cf12\b in} {\cf8 range}({\cf4 1})] {\cf8\b for} x {\cf12\b in} {\cf8 range}({\cf4 2})] {\cf8\b for} x {\cf12\b in} {\cf8 range}({\cf4 1})]\par
+    {\cf8\b for} i {\cf12\b in} {\cf8 range}({\cf4 0}, n):\par
+        linecost[i][i] {\cf4 =} M {\cf4 -} {\cf8 len}(words[i])\par
+        {\cf8\b for} j {\cf12\b in} {\cf8 range}(i {\cf4 +} {\cf4 1}, n):\par
+            linecost[i][j] {\cf4 =} linecost[i][j {\cf4 -} {\cf4 1}] {\cf4 -} {\cf8 len}(words[j]) {\cf4 -} {\cf4 1}\par
+        {\cf8\b for} j {\cf12\b in} {\cf8 range}(i, n):\par
+            {\cf8\b if} (linecost[i][j] {\cf4 <} {\cf4 0}):\par
+                linecost[i][j] {\cf4 =} INFINITY\par
+            {\cf8\b else}:\par
+                {\cf8\b if} (j {\cf4 ==} n {\cf4 -} {\cf4 1}):\par
+                    linecost[i][j] {\cf4 =} {\cf4 0}\par
+                    options{\cf4 .}append([[{\cf4 0}], [i]])\par
+                {\cf8\b else}:\par
+                    linecost[i][j] {\cf4 =} linecost[i][j] {\cf4 *}{\cf4 *} {\cf4 3}\par
+    optimal {\cf4 =} {\cf4 -}{\cf4 1}\par
+    cost {\cf4 =} INFINITY\par
+    which {\cf4 =} {\cf4 1}\par
+    {\cf8\b for} i {\cf12\b in} {\cf8 range}({\cf4 0}, {\cf8 len}(options) {\cf4 -} {\cf4 1}):\par
+        linestart {\cf4 =} {\cf4 -}{\cf4 1}\par
+        {\cf8\b while} (linestart {\cf4 !=} {\cf4 0}):\par
+            linestart, addcost {\cf4 =} findPreviousLineStart(\par
+                linecost, n, options[which][{\cf4 1}][{\cf4 0}])\par
+            options[which][{\cf4 1}]{\cf4 .}insert({\cf4 0}, linestart)\par
+            options[which][{\cf4 0}][{\cf4 0}] {\cf4 +}{\cf4 =} addcost\par
+        which {\cf4 +}{\cf4 =} {\cf4 1}\par
+        {\cf8\b if} (options[i {\cf4 +} {\cf4 1}][{\cf4 0}][{\cf4 0}] {\cf4 <} cost):\par
+            optimal {\cf4 =} i\par
+            cost {\cf4 =} options[i {\cf4 +} {\cf4 1}][{\cf4 0}][{\cf4 0}]\par
+    text {\cf4 =} oneString(words, options[optimal {\cf4 +} {\cf4 1}][{\cf4 1}], M)\par
+    {\cf8\b return} (cost, text)\par
+\par
+\par
+{\cf8\b def} {\cf19 oneString}(words, indices, M):\par
+    text {\cf4 =} {\cf2 "}{\cf2 "}\par
+    lines {\cf4 =} {\cf8 len}(indices)\par
+    indices{\cf4 .}insert(lines, {\cf8 len}(words))\par
+    {\cf8\b for} i {\cf12\b in} {\cf8 range}({\cf4 0}, lines {\cf4 -} {\cf4 1}):\par
+        line {\cf4 =} {\cf2 "}{\cf2 "}\par
+        {\cf8\b for} j {\cf12\b in} {\cf8 range}(indices[i], indices[i {\cf4 +} {\cf4 1}] {\cf4 -} {\cf4 1}):\par
+            line {\cf4 +}{\cf4 =} words[j] {\cf4 +} {\cf2 '}{\cf2  }{\cf2 '}\par
+        line {\cf4 +}{\cf4 =} words[indices[i {\cf4 +} {\cf4 1}] {\cf4 -} {\cf4 1}]\par
+        numspaces {\cf4 =} M {\cf4 -} {\cf8 len}(line)\par
+        line {\cf4 +}{\cf4 =} numspaces {\cf4 *} {\cf2 '}{\cf2  }{\cf2 '} {\cf4 +} {\cf2 '}{\cf10\b \\n}{\cf2 '}\par
+        text {\cf4 +}{\cf4 =} line\par
+    {\cf8\b for} j {\cf12\b in} {\cf8 range}(indices[lines {\cf4 -} {\cf4 1}], indices[lines]):\par
+        text {\cf4 +}{\cf4 =} words[j] {\cf4 +} {\cf2 '}{\cf2  }{\cf2 '}\par
+    {\cf8\b return} text\par
+\par
+\par
+{\cf8\b def} {\cf19 findPreviousLineStart}(linecost, n, {\cf8 next}):\par
+    minimum {\cf4 =} INFINITY\par
+    linestart {\cf4 =} {\cf4 -}{\cf4 1}\par
+    {\cf8\b for} i {\cf12\b in} {\cf8 range}({\cf4 0}, {\cf8 next} {\cf4 -} {\cf4 1}):\par
+        {\cf8\b if} (linecost[i][{\cf8 next} {\cf4 -} {\cf4 1}] {\cf4 <} minimum):\par
+            minimum {\cf4 =} linecost[i][{\cf8 next} {\cf4 -} {\cf4 1}]\par
+            linestart {\cf4 =} i\par
+            addcost {\cf4 =} linecost[i][{\cf8 next} {\cf4 -} {\cf4 1}]\par
+    {\cf8\b return} linestart, addcost\par
+}
